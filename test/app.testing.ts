@@ -8,6 +8,7 @@ import { MailerService } from '../src/modules/mailer/mailer.service';
 import { ConfigService } from '../src/modules/config/config.service';
 
 const mockMailTransport = mockTransport();
+
 export const createTestingApp = async (): Promise<NestExpressApplication> => {
   const moduleFixture: TestingModule = await Test.createTestingModule({
     imports: [AppModule],

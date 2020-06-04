@@ -63,7 +63,7 @@ export class ConfigService {
       logging: process.env.DB_LOGGING === 'true',
     };
 
-    const test: TypeOrmModuleOptions = {
+    const test = {
       type: process.env.DB_TYPE as DatabaseType,
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
@@ -73,7 +73,7 @@ export class ConfigService {
       ...commonOptions,
     } as ConnectionOptions;
 
-    const development: TypeOrmModuleOptions = {
+    const development = {
       type: process.env.DB_TYPE as DatabaseType,
       host: process.env.DB_HOST,
       port: Number(process.env.DB_PORT),
@@ -90,11 +90,7 @@ export class ConfigService {
       ...commonOptions,
     };
 
-    const configs: { [key: string]: TypeOrmModuleOptions } = {
-      development,
-      test,
-      production,
-    };
+    const configs: { [key: string]: TypeOrmModuleOptions } = { development, test, production };
 
     return configs[env];
   }
