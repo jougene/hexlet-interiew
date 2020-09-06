@@ -1,12 +1,12 @@
 import { IsNotEmpty } from 'class-validator';
 import { classToPlain, Expose } from 'class-transformer';
-import { BeforeInsert, Entity, Column, PrimaryGeneratedColumn, OneToMany } from 'typeorm';
+import { BeforeInsert, Entity, Column, PrimaryGeneratedColumn, OneToMany, BaseEntity } from 'typeorm';
 import uuidGenerate from 'uuid/v4';
 import { hashPassword } from '../../common/utils/password';
 import { Interview } from '../interview/interview.entity';
 
 @Entity('user')
-export class User {
+export class User extends BaseEntity {
   @PrimaryGeneratedColumn('increment')
   id: number;
 

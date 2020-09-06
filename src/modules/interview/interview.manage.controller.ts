@@ -21,7 +21,7 @@ import { BadRequestExceptionFilter } from '../../common/filters/bad-request-exce
 import { User } from '../user/user.entity';
 import { Interview, interviewState } from './interview.entity';
 import { FormData } from '../../common/utils/form-data';
-import { prepareDate } from '../../common/utils/prepare-data.util';
+import { prepareDate } from '../../common/utils/prepare-date.util';
 
 @Controller('interview/manage')
 @UseGuards(AuthenticatedGuard)

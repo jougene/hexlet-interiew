@@ -15,6 +15,7 @@ module.exports = {
       rules: {
         'import/no-extraneous-dependencies': ['error', { devDependencies: ['**/test/**/*.ts'] }],
         'no-useless-constructor': 'off',
+        'import/extensions': 'never',
         '@typescript-eslint/no-useless-constructor': 'error',
         'import/prefer-default-export': 'off',
         'class-methods-use-this': 'off',
@@ -51,7 +52,7 @@ module.exports = {
       files: ['*.js'],
       env: {
         browser: true,
-        jquery: true
+        jquery: true,
       },
     },
   ],
