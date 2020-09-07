@@ -25,11 +25,11 @@ export class Interview extends BaseEntity {
   @Column({ type: 'varchar' })
   state: interviewState;
 
-  @ManyToOne(() => User, user => user.interviews)
+  @ManyToOne(() => User, user => user.interviews, { eager: true })
   @JoinColumn({ name: 'interviewee_id' })
   interviewee: User;
 
-  @ManyToOne(() => User, user => user.interviews)
+  @ManyToOne(() => User, user => user.interviews, { eager: true })
   @JoinColumn({ name: 'interviewer_id' })
   interviewer: User | null;
 

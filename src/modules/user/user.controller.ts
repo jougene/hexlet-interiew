@@ -33,11 +33,4 @@ export class UserController {
     await this.service.createAndSave(userCreateDto);
     return res.redirect('user');
   }
-
-  @Role('admin')
-  @Delete(':id/delete')
-  async delete(@Res() res: Response, @Param('id') id: number): Promise<void> {
-    await this.service.delete(id);
-    return res.redirect('user');
-  }
 }

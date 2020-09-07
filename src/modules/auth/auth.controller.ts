@@ -20,6 +20,7 @@ import { UserService } from '../user/user.service';
 import { UserCreateDto } from '../user/dto/user.create.dto';
 import { MailerService } from '../mailer/mailer.service';
 import { BadRequestExceptionFilter } from '../../common/filters/bad-request-exception.filter';
+import { User } from '../user/user.entity';
 
 @Controller('auth')
 export class AuthController {
@@ -78,10 +79,7 @@ export class AuthController {
   @Redirect('/auth/sign_in')
   @Get('verify/:token')
   async verifyToken(@Req() req: Request, @Param('token') token: string): Promise<void> {
-    const user = await this.userService.findOneByConfirmationToken(token);
-    if (!user) {
-      throw new NotFoundException();
-    }
+    const user = await User.findOneOrFail({ confirmationToken: token });
 
     await this.userService.verify(user);
     req.flash('success', i18n.__('users.form.registration_success'));

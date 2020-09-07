@@ -22,6 +22,7 @@ import { BadRequestExceptionFilter } from '../../common/filters/bad-request-exce
 import { User } from '../user/user.entity';
 import { FormData } from '../../common/utils/form-data';
 import { ReqUser } from '../../common/decorators/req-user.decorator';
+import { Interview } from './interview.entity';
 
 @Controller('interview/application')
 @UseGuards(AuthenticatedGuard)
@@ -56,7 +57,7 @@ export class InterviewApplicationController {
     @Param('id') applicationId: number,
     @ReqUser() user: User,
   ): Promise<{ editFormData: FormData; id: number }> {
-    const interview = await this.interviewService.findOneById(applicationId);
+    const interview = await Interview.findOneOrFail(applicationId);
     if (!interview || user.id !== interview.interviewee.id) {
       throw new NotFoundException();
     }
@@ -79,10 +80,7 @@ export class InterviewApplicationController {
     @Req() req: Request,
     @Res() res: Response,
   ): Promise<void> {
-    const interview = await this.interviewService.findOneById(applicationId);
-    if (!interview) {
-      throw new NotFoundException();
-    }
+    const interview = await Interview.findOneOrFail(applicationId);
     if (user.id !== interview.interviewee.id) {
       throw new BadRequestException(i18n.__('interview.form.not-own-error'));
     }

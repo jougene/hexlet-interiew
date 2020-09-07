@@ -37,10 +37,7 @@ export class InterviewManageController {
     @Param('id') id: number,
     @Req() req: Request,
   ): Promise<{ interview: Interview; interviewers: User[] }> {
-    const interview = await this.interviewService.findOneById(id);
-    if (!interview) {
-      throw new NotFoundException();
-    }
+    const interview = await Interview.findOneOrFail(id);
     const interviewers = await this.userService.getInterviewers();
     const renderData = { interview, interviewers };
     // Save data for error render in BadRequestExceptionFilter.
@@ -88,10 +85,7 @@ export class InterviewManageController {
   @Role('admin')
   @Render('interview/add-edit')
   async getEdit(@Req() req: Request, @Param('id') id: number): Promise<{ interviewees: User[]; interviewers: User[] }> {
-    const interview = await this.interviewService.findOneById(id);
-    if (!interview) {
-      throw new NotFoundException();
-    }
+    const interview = await Interview.findOneOrFail(id);
     const { interviewer, interviewee, date, createdAt, updatedAt, ...restInterview } = interview;
     const editFormData = new FormData({
       ...restInterview,
@@ -116,10 +110,7 @@ export class InterviewManageController {
     @Res() res: Response,
     @Req() req: Request,
   ): Promise<void> {
-    const interview = await this.interviewService.findOneById(id);
-    if (!interview) {
-      throw new NotFoundException();
-    }
+    const interview = await Interview.findOneOrFail(id);
     await this.interviewService.update(interview, dto);
     delete req.session!.savedRenderData;
     res.redirect('/interview/manage/application');

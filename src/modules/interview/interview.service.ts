@@ -1,31 +1,21 @@
-import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, FindConditions, FindManyOptions } from 'typeorm';
-import { Injectable, BadRequestException } from '@nestjs/common';
-import { Interview, interviewState } from './interview.entity';
+import { FindConditions, FindManyOptions } from 'typeorm';
+import { Injectable } from '@nestjs/common';
+import { Interview } from './interview.entity';
 import { InterviewApplicationDto, InterviewAssignmentDto, InterviewAddEditDto } from './dto';
 import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 
 @Injectable()
 export class InterviewService {
-  constructor(
-    @InjectRepository(Interview) private readonly interviewRepo: Repository<Interview>,
-    public userService: UserService,
-  ) {}
+  constructor( public userService: UserService) {}
 
   get(options: FindConditions<Interview> & FindManyOptions<Interview>): Promise<Interview[]> {
     const defaultOptions = {
       order: { date: 'DESC' },
     };
-    return this.interviewRepo.find({
+    return Interview.find({
       ...defaultOptions,
       ...options,
-    });
-  }
-
-  async findOneById(id: number): Promise<Interview | undefined> {
-    return this.interviewRepo.findOne(id, {
-      relations: ['interviewee', 'interviewer'],
     });
   }
 
@@ -46,48 +36,52 @@ export class InterviewService {
       // TODO: we need to trim empty props from request body on pipe level.
       date: restDto.date || undefined,
     };
-    const interview = this.interviewRepo.create(entity);
+    const interview = Interview.create(entity);
     return interview.save();
   }
 
-  async update(toUpdate: Interview, dto: InterviewAddEditDto): Promise<Interview> {
-    const { interviewerId, intervieweeId, ...restDto } = dto;
-    const interviewee = await this.userService.findOneById(Number(intervieweeId), 'user');
+  async update(interview: Interview, dto: InterviewAddEditDto): Promise<Interview> {
+    const { interviewerId, intervieweeId } = dto;
+    const interviewee = await User.findOneOrFail(Number(intervieweeId), { relations: ['user'] });
     let interviewer: User | null = null;
     if (interviewerId) {
-      interviewer = (await this.userService.findOneById(Number(interviewerId), 'interviewer')) || null;
+      interviewer = await User.findOneOrFail(Number(interviewerId));
     }
-    return this.interviewRepo.save({
-      ...toUpdate,
-      ...restDto,
-      interviewee,
-      interviewer,
-      date: restDto.date || undefined,
-    });
+
+    interview.interviewee = interviewee;
+    interview.interviewer = interviewer;
+    interview.date = new Date(dto.date);
+    interview.description = dto.description;
+    interview.profession = dto.profession;
+    interview.position = dto.position;
+    interview.videoLink = dto.videoLink;
+
+    return interview.save();
   }
 
   addApplication(interviewApplicationDto: InterviewApplicationDto, user: User): Promise<Interview> {
     const entity = { ...interviewApplicationDto, interviewee: user };
-    const interview = this.interviewRepo.create(entity);
+    const interview = Interview.create(entity);
     return interview.save();
   }
 
-  editApplication(application: Interview, interviewApplicationDto: InterviewApplicationDto): Promise<Interview> {
-    return this.interviewRepo.save({ ...application, ...interviewApplicationDto });
+  editApplication(application: Interview, dto: InterviewApplicationDto): Promise<Interview> {
+    application.profession = dto.profession;
+    application.position = dto.position;
+    application.description = dto.description;
+
+    return application.save();
   }
 
-  async assign(id: number, interviewAssignmentDto: InterviewAssignmentDto): Promise<Interview> {
-    const toUpdate = await this.interviewRepo.findOne(id);
-    const { interviewerId, ...assignData } = interviewAssignmentDto;
+  async assign(id: number, dto: InterviewAssignmentDto): Promise<Interview> {
+    const interview = await Interview.findOneOrFail(id);
+    const { interviewerId } = dto;
     const interviewer = await this.userService.findOneById(Number(interviewerId));
-    if (!interviewer) {
-      throw new BadRequestException("Can't find such user");
-    }
-    return this.interviewRepo.save({
-      ...toUpdate,
-      ...assignData,
-      interviewer,
-      state: interviewState.COMING,
-    });
+
+    interview.interviewer = interviewer;
+    interview.date = new Date(dto.date);
+    interview.videoLink = dto.videoLink;
+
+    return interview.save();
   }
 }
