@@ -1,13 +1,13 @@
 import { FindConditions, FindManyOptions } from 'typeorm';
 import { Injectable } from '@nestjs/common';
-import { Interview } from './interview.entity';
+import { Interview, interviewState } from './interview.entity';
 import { InterviewApplicationDto, InterviewAssignmentDto, InterviewAddEditDto } from './dto';
 import { UserService } from '../user/user.service';
 import { User } from '../user/user.entity';
 
 @Injectable()
 export class InterviewService {
-  constructor( public userService: UserService) {}
+  constructor(public userService: UserService) {}
 
   get(options: FindConditions<Interview> & FindManyOptions<Interview>): Promise<Interview[]> {
     const defaultOptions = {
@@ -42,7 +42,7 @@ export class InterviewService {
 
   async update(interview: Interview, dto: InterviewAddEditDto): Promise<Interview> {
     const { interviewerId, intervieweeId } = dto;
-    const interviewee = await User.findOneOrFail(Number(intervieweeId), { relations: ['user'] });
+    const interviewee = await User.findOneOrFail(Number(intervieweeId), { relations: ['interviews'] });
     let interviewer: User | null = null;
     if (interviewerId) {
       interviewer = await User.findOneOrFail(Number(interviewerId));
@@ -81,6 +81,7 @@ export class InterviewService {
     interview.interviewer = interviewer;
     interview.date = new Date(dto.date);
     interview.videoLink = dto.videoLink;
+    interview.state = interviewState.COMING;
 
     return interview.save();
   }

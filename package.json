@@ -50,6 +50,7 @@
     "express-rate-limit": "^5.0.0",
     "express-session": "^1.16.2",
     "helmet": "^3.21.1",
+    "http-debug": "^0.1.2",
     "i18n": "^0.8.3",
     "jquery": "^3.4.1",
     "jquery-ujs": "^1.2.2",

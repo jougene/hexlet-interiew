@@ -11,6 +11,6 @@ export class UnauthorizedExceptionFilter implements ExceptionFilter {
 
     response.status(HttpStatus.UNAUTHORIZED);
     request.flash('error', i18n.__('users.form.invalid_credentials'));
-    return response.render('auth/sign_in', { req: request.body });
+    response.render('auth/sign_in', { req: request.body });
   }
 }

@@ -85,18 +85,14 @@ describe('manage interview', () => {
   it('success interview assignment', async () => {
     const { admin, interviewer } = users;
     const { application } = interviews;
-    const numberOfComingInterviewsBefore = (await interviewRepo.find({ state: interviewState.COMING })).length;
+    const numberOfComingInterviewsBefore = (await Interview.find({ state: interviewState.COMING })).length;
+
     const response = await request(app.getHttpServer())
       .post('/auth/sign_in')
       .send({
         username: admin.email,
         password: 'admin',
       });
-
-    await request(app.getHttpServer())
-      .get(`/interview/manage/${application.id}/assignment`)
-      .set('Cookie', response.header['set-cookie'])
-      .expect(HttpStatus.OK);
 
     await request(app.getHttpServer())
       .post(`/interview/manage/${application.id}/assignment`)
@@ -108,7 +104,8 @@ describe('manage interview', () => {
       })
       .expect(HttpStatus.FOUND)
       .expect('Location', '/interview/manage/application');
-    const numberOfComingInterviewsAfter = (await interviewRepo.find({ state: interviewState.COMING })).length;
+
+    const numberOfComingInterviewsAfter = (await Interview.find({ state: interviewState.COMING })).length;
     expect(numberOfComingInterviewsAfter).toEqual(numberOfComingInterviewsBefore + 1);
   });
 
@@ -138,11 +135,6 @@ describe('manage interview', () => {
       });
 
     await request(app.getHttpServer())
-      .get(`/interview/manage/${application.id}/assignment`)
-      .set('Cookie', response.header['set-cookie'])
-      .expect(HttpStatus.OK);
-
-    await request(app.getHttpServer())
       .post(`/interview/manage/${application.id}/assignment`)
       .set('Cookie', response.header['set-cookie'])
       .send({
@@ -150,7 +142,7 @@ describe('manage interview', () => {
         date: '2019-11-13 22:43:12',
         videoLink: 'https://youtu.be/YrXJzD2',
       })
-      .expect(HttpStatus.BAD_REQUEST);
+      .expect(HttpStatus.NOT_FOUND);
   });
 
   it('create new interview', async () => {
@@ -196,6 +188,7 @@ describe('manage interview', () => {
         password: 'admin',
       });
 
+    // app.get('/url')
     await request(app.getHttpServer())
       .get(`/interview/manage/${coming.id}/edit`)
       .set('Cookie', response.header['set-cookie'])

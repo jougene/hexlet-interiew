@@ -17,6 +17,7 @@ import {
   NotFoundExceptionFilter,
 } from './common/filters';
 import viewHelpers from './common/utils/view.helpers';
+import { EntityNotFoundExceptionFilter } from './common/filters/entity-not-found.filter';
 
 const getDateLocale = (locale: string): dateFns.Locale => {
   const mapLocale = {
@@ -36,6 +37,7 @@ i18n.configure({
 export const bootstrapApp = (app: NestExpressApplication): void => {
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
   app.useGlobalFilters(new NotFoundExceptionFilter());
+  app.useGlobalFilters(new EntityNotFoundExceptionFilter());
   app.useGlobalFilters(new ForbiddenExceptionFilter());
   app.useGlobalFilters(new UnauthorizedExceptionFilter());
   app.useGlobalFilters(new GitHubUnauthorizedExceptionFilter());

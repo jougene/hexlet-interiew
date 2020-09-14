@@ -100,7 +100,7 @@ export class InterviewManageController {
     return renderData;
   }
 
-  // TODO: should be PUTCH method and :id url.
+  // TODO: should be PUT method and :id url.
   @Post(':id/edit')
   @Role('admin')
   @UseFilters(new BadRequestExceptionFilter('interview/add-edit'))
